@@ -1,0 +1,38 @@
+1. Domain
+1.1. Entities
+1.1.1. Movie (abstract, interface)
+1.1.1.1. MovieNetworkE
+1.1.1.2. MovieAppE
+1.1.2. User
+2. Data
+2.1. Repositories
+2.1.1. MoviesRepository
+2.2. DataSources
+2.2.1. MovieStubDatasource
+2.2.1.1. bundled json file
+2.2.1.2. parse json file to MovieNetworkE
+2.2.1.3. transform MovieNetworkE to MovieAppE
+2.2.2. MovieNetworkDataSource
+2.2.2.1. execute get request
+2.2.2.2. consume json response
+2.2.2.3. parse json response to MovieNetworkE
+2.2.2.4. transform MovieNetworkE to MovieAppE
+2.2.3. UserLocalDataSource
+2.2.3.1. save user data to local storage
+3. Presentation
+3.1. MoviesListScreen
+3.1.1. MovieCardRow
+3.1.1.1. MovieTitleWidget
+3.1.1.2. MoviePosterWidget
+3.1.1.3. MovieRatingWidget
+3.2. MovieDetailsScreen
+3.2.1. MoviePosterWidget
+3.2.2. MovieTitleWidget
+3.2.3. MovieRatingWidget
+3.2.4. MovieGenresWidget
+3.2.5. MovieActorsWidget
+3.3. UserScreen
+3.3.1. UserAvatarWidget
+3.3.2. UserNameWidget
+3.3.3. UserWatchlistWidget
+3.3.3.1. MovieCardRow
