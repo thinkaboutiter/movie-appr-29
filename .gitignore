@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/macos,flutter,dart,xcode,androidstudio,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,flutter,dart,xcode,androidstudio,visualstudiocode
 
+### USER SPECIFIC ###
+.plugin_symlinks
+
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
 
