@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:movie_29/data/datasources/movies_datasource.dart';
 import 'package:movie_29/utils/constants.dart';
-import '../../data/datasources/movie_network_datasource.dart';
-import '../../data/datasources/movie_stub_datasource.dart';
+import '../../data/datasources/movies_network_datasource.dart';
+import '../../data/datasources/movies_stub_datasource.dart';
 import '../../data/datasources/user_local_datasource.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../presentation/screens/movies_list_screen.dart';
@@ -14,25 +15,24 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
+final bool isUsingStubData = false;
+
 class _MainScreenState extends State<MainScreen> {
-  late final MovieStubDataSource _stubDataSource;
-  late final MovieNetworkDataSource _networkDataSource;
+  late final MoviesDatasource _datasource;
   late final MoviesRepository _moviesRepository;
   late final UserLocalDataSource _userDataSource;
-  
+
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _stubDataSource = MovieStubDataSource();
-    _networkDataSource = MovieNetworkDataSource(
-      apiUrl: ApiEndpoints.movies,
-    );
-    _moviesRepository = MoviesRepository(
-      networkDataSource: _networkDataSource,
-      stubDataSource: _stubDataSource,
-    );
+    if (isUsingStubData) {
+      _datasource = MoviesStubDataSource();
+    } else {
+      _datasource = MoviesNetworkDataSource(apiUrl: ApiEndpoints.movies);
+    }
+    _moviesRepository = MoviesRepository(datasource: _datasource);
     _userDataSource = UserLocalDataSource();
   }
 

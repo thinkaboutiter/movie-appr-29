@@ -1,34 +1,28 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
+import 'package:movie_29/data/datasources/movies_datasource.dart';
 import '../../domain/entities/movie_app_e.dart';
-import '../datasources/movie_network_datasource.dart';
-import '../datasources/movie_stub_datasource.dart';
 
 class MoviesRepository {
-  final MovieNetworkDataSource _networkDataSource;
-  final MovieStubDataSource _stubDataSource;
-  
+  final MoviesDatasource _datasource;
+
   // Cache for movies
   final List<MovieAppE> _moviesCache = [];
-  
+
   // Controller for movie updates
   final _moviesController = StreamController<List<MovieAppE>>.broadcast();
-  
+
   // Stream of movies
   Stream<List<MovieAppE>> get movies => _moviesController.stream;
 
-  MoviesRepository({
-    required MovieNetworkDataSource networkDataSource,
-    required MovieStubDataSource stubDataSource,
-  }) : _networkDataSource = networkDataSource,
-       _stubDataSource = stubDataSource;
+  MoviesRepository({required MoviesDatasource datasource})
+    : _datasource = datasource;
 
   // Initialize repository with stub data
   Future<void> init() async {
     if (_moviesCache.isEmpty) {
       try {
-        final movies = await _stubDataSource.getMovies();
+        final movies = await _datasource.getMovies();
         _moviesCache.addAll(movies);
         _moviesController.add(_moviesCache);
       } catch (e) {
@@ -40,7 +34,7 @@ class MoviesRepository {
   // Fetch latest movies from network
   Future<List<MovieAppE>> fetchMovies() async {
     try {
-      final movies = await _networkDataSource.getMovies();
+      final movies = await _datasource.getMovies();
       _moviesCache.clear();
       _moviesCache.addAll(movies);
       _moviesController.add(_moviesCache);
@@ -59,7 +53,7 @@ class MoviesRepository {
       (movie) => movie.id == id,
       orElse: () => throw Exception('Movie not found in cache'),
     );
-    
+
     return cachedMovie;
   }
 
