@@ -60,6 +60,9 @@ class MoviesRepository {
   // Toggle favorite status
   Future<void> toggleFavorite(String id) async {
     final index = _moviesCache.indexWhere((movie) => movie.id == id);
+    
+    debugPrint('Toggling favorite for movie with ID: $id, index: $index');
+
     if (index != -1) {
       final movie = _moviesCache[index];
       _moviesCache[index] = movie.copyWith(isFavorite: !movie.isFavorite);
