@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:movie_29/utils/constants.dart';
 import '../../domain/entities/movie_app_e.dart';
 import '../../domain/entities/movie_network_e.dart';
 import '../datasources/movies_network_datasource_i.dart';
@@ -22,6 +21,10 @@ class MoviesRepository {
   }
 
   final MoviesNetworkDatasourceI _networkDatasource;
+  
+  MoviesRepository({
+    MoviesNetworkDatasourceI? networkDatasource,
+  }) : _networkDatasource = networkDatasource ?? MoviesNetworkDataSource();
 
   // Cache for movies
   final List<MovieAppE> _moviesCache = [];
@@ -31,10 +34,6 @@ class MoviesRepository {
 
   // Stream of movies
   Stream<List<MovieAppE>> get movies => _moviesController.stream;
-
-  MoviesRepository({
-    MoviesNetworkDatasourceI? networkDatasource,
-  }) : _networkDatasource = networkDatasource ?? MoviesNetworkDataSource();
 
   // Future<void> init() async {
   //   if (_moviesCache.isEmpty) {
@@ -82,17 +81,17 @@ class MoviesRepository {
   }
 
   // Toggle favorite status
-  Future<void> toggleFavorite(String id) async {
-    final index = _moviesCache.indexWhere((movie) => movie.id == id);
+  // Future<void> toggleFavorite(String id) async {
+  //   final index = _moviesCache.indexWhere((movie) => movie.id == id);
 
-    debugPrint('Toggling favorite for movie with ID: $id, index: $index');
+  //   debugPrint('Toggling favorite for movie with ID: $id, index: $index');
 
-    if (index != -1) {
-      final movie = _moviesCache[index];
-      _moviesCache[index] = movie.copyWith(isFavorite: !movie.isFavorite);
-      _moviesController.add(_moviesCache);
-    }
-  }
+  //   if (index != -1) {
+  //     final movie = _moviesCache[index];
+  //     _moviesCache[index] = movie.copyWith(isFavorite: !movie.isFavorite);
+  //     _moviesController.add(_moviesCache);
+  //   }
+  // }
 
   void dispose() {
     _moviesController.close();

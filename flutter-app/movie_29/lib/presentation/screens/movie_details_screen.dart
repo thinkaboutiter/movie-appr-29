@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_29/data/repositories/user_repository.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../domain/entities/movie_app_e.dart';
 import '../widgets/movie_actors_widget.dart';
@@ -6,16 +7,23 @@ import '../widgets/movie_genres_widget.dart';
 import '../widgets/movie_poster_widget.dart';
 import '../widgets/movie_rating_widget.dart';
 import '../widgets/movie_title_widget.dart';
+import '../../utils/watch_list_support.dart';
 
 class MovieDetailsScreen extends StatelessWidget {
   final MovieAppE movie;
-  final MoviesRepository repository;
+  final MoviesRepository moviesRepository;
+  final UserRepository userRepository;
+  late final WatchListSupport watchListSupport;
 
-  const MovieDetailsScreen({
+  MovieDetailsScreen({
     super.key,
     required this.movie,
-    required this.repository,
-  });
+    required this.moviesRepository,
+    required this.userRepository,
+  }) : watchListSupport = WatchListSupport(
+          moviesRepository: moviesRepository,
+          userRepository: userRepository,
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -29,17 +37,17 @@ class MovieDetailsScreen extends StatelessWidget {
               color: movie.isFavorite ? Colors.red : null,
             ),
             onPressed: () {
-              repository.toggleFavorite(movie.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    movie.isFavorite
-                        ? 'Removed from favorites'
-                        : 'Added to favorites',
-                  ),
-                  duration: const Duration(seconds: 1),
-                ),
-              );
+              // repository.toggleFavorite(movie.id);
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(
+              //     content: Text(
+              //       movie.isFavorite
+              //           ? 'Removed from favorites'
+              //           : 'Added to favorites',
+              //     ),
+              //     duration: const Duration(seconds: 1),
+              //   ),
+              // );
             },
           ),
         ],
@@ -95,10 +103,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                 isLarge: true,
                               ),
                               const SizedBox(height: 8),
-                              MovieRatingWidget(
-                                rating: movie.rating,
-                                size: 20,
-                              ),
+                              MovieRatingWidget(rating: movie.rating, size: 20),
                               const SizedBox(height: 8),
                               if (movie.duration.isNotEmpty)
                                 Text(
@@ -125,32 +130,20 @@ class MovieDetailsScreen extends StatelessWidget {
                 children: [
                   const Text(
                     'Genres',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  MovieGenresWidget(
-                    genres: movie.genres,
-                    fontSize: 14,
-                  ),
+                  MovieGenresWidget(genres: movie.genres, fontSize: 14),
                   const SizedBox(height: 24),
                   // Storyline
                   const Text(
                     'Storyline',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     movie.storyline,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
+                    style: const TextStyle(fontSize: 16, height: 1.5),
                   ),
                   const SizedBox(height: 24),
                   // Cast

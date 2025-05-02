@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:movie_29/data/repositories/user_repository.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../presentation/screens/movies_list_screen.dart';
 import '../../presentation/screens/user_screen.dart';
+import 'package:movie_29/domain/entities/user_app_e.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,7 +16,7 @@ final bool isUsingStubData = false;
 
 class _MainScreenState extends State<MainScreen> {
   late final MoviesRepository _moviesRepository;
-  late final UserLocalDataSource _userDataSource;
+  late final UserRepository _userRepository;
 
   int _selectedIndex = 0;
 
@@ -22,7 +24,18 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _moviesRepository = MoviesRepository();
-    // _userDataSource = UserLocalDataSource();
+    _userRepository = UserRepository();
+    _createDefaultUser();
+  }
+
+  void _createDefaultUser() async {
+    // Create default user if none exists
+    final defaultUser = await _userRepository.fetchUser();
+    if (defaultUser != null) {
+      return;
+    }
+    final newUser = UserAppE(id: '1', name: 'Movie Fan', watchlistIds: []);
+    await _userRepository.saveUser(newUser);
   }
 
   @override
@@ -43,9 +56,12 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          MoviesListScreen(repository: _moviesRepository),
+          MoviesListScreen(
+            moviesRepository: _moviesRepository,
+            userRepository: _userRepository,
+          ),
           UserScreen(
-            userDataSource: _userDataSource,
+            userRepository: _userRepository,
             moviesRepository: _moviesRepository,
           ),
         ],
