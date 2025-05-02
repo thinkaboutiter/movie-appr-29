@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../domain/entities/movie_app_e.dart';
 import '../../domain/entities/movie_network_e.dart';
 import 'movies_network_datasource_i.dart';
+import 'package:movie_29/utils/constants.dart';
 
 class MoviesNetworkDataSource extends MoviesNetworkDatasourceI {
   final String apiUrl;
 
-  MoviesNetworkDataSource({required this.apiUrl});
-  
+  MoviesNetworkDataSource({this.apiUrl = ApiEndpoints.movies});
+
   @override
   Future<List<MovieNetworkE>> getMovies() async {
     try {

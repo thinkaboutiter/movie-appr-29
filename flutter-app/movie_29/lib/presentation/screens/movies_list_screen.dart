@@ -31,7 +31,7 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
       _isLoading = true;
     });
 
-    await widget.repository.init();
+    // await widget.repository.init();
     
     // Subscribe to the stream
     widget.repository.movies.listen((movies) {

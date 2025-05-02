@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movie_29/data/datasources/movies_datasource.dart';
-import 'package:movie_29/utils/constants.dart';
-import '../../data/datasources/movies_network_datasource.dart';
-import '../../data/datasources/movies_stub_network_datasource.dart';
-import '../../data/datasources/user_local_datasource.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../presentation/screens/movies_list_screen.dart';
 import '../../presentation/screens/user_screen.dart';
@@ -18,7 +13,6 @@ class MainScreen extends StatefulWidget {
 final bool isUsingStubData = false;
 
 class _MainScreenState extends State<MainScreen> {
-  late final MoviesDatasource _datasource;
   late final MoviesRepository _moviesRepository;
   late final UserLocalDataSource _userDataSource;
 
@@ -27,13 +21,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    if (isUsingStubData) {
-      _datasource = MoviesStubDataSource();
-    } else {
-      _datasource = MoviesNetworkDataSource(apiUrl: ApiEndpoints.movies);
-    }
-    _moviesRepository = MoviesRepository(datasource: _datasource);
-    _userDataSource = UserLocalDataSource();
+    _moviesRepository = MoviesRepository();
+    // _userDataSource = UserLocalDataSource();
   }
 
   @override
