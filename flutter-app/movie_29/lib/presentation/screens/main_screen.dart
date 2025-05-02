@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movie_29/data/datasources/movies_datasource.dart';
 import 'package:movie_29/utils/constants.dart';
 import '../../data/datasources/movies_network_datasource.dart';
-import '../../data/datasources/movies_stub_datasource.dart';
+import '../../data/datasources/movies_stub_network_datasource.dart';
 import '../../data/datasources/user_local_datasource.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../presentation/screens/movies_list_screen.dart';

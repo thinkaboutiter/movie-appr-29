@@ -2,15 +2,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../domain/entities/movie_app_e.dart';
 import '../../domain/entities/movie_network_e.dart';
-import 'movies_datasource.dart';
+import 'movies_network_datasource_i.dart';
 
-class MoviesNetworkDataSource extends MoviesDatasource {
+class MoviesNetworkDataSource extends MoviesNetworkDatasourceI {
   final String apiUrl;
 
   MoviesNetworkDataSource({required this.apiUrl});
-
+  
   @override
-  Future<List<MovieAppE>> getMovies() async {
+  Future<List<MovieNetworkE>> getMovies() async {
     try {
       // Execute GET request
       final response = await http.get(Uri.parse(apiUrl));
@@ -23,10 +23,7 @@ class MoviesNetworkDataSource extends MoviesDatasource {
         final List<MovieNetworkE> networkMovies =
             jsonList.map((json) => MovieNetworkE.fromJson(json)).toList();
 
-        // Transform to MovieAppE
-        return networkMovies
-            .map((networkMovie) => MovieAppE.fromNetworkEntity(networkMovie))
-            .toList();
+        return networkMovies;
       } else {
         throw Exception('Failed to load movies: ${response.statusCode}');
       }

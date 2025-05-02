@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:movie_29/data/datasources/movies_datasource.dart';
 import '../../domain/entities/movie_app_e.dart';
+import '../datasources/movies_network_datasource_i.dart';
 
 class MoviesRepository {
-  final MoviesDatasource _datasource;
+  final MoviesNetworkDatasourceI _networkDatasource;
 
   // Cache for movies
   final List<MovieAppE> _moviesCache = [];
@@ -15,14 +15,16 @@ class MoviesRepository {
   // Stream of movies
   Stream<List<MovieAppE>> get movies => _moviesController.stream;
 
-  MoviesRepository({required MoviesDatasource datasource})
-    : _datasource = datasource;
+  MoviesRepository({required MoviesNetworkDatasourceI networkDatasource})
+    : _networkDatasource = networkDatasource;
 
   // Initialize repository with stub data
   Future<void> init() async {
     if (_moviesCache.isEmpty) {
       try {
-        final movies = await _datasource.getMovies();
+        final movies = await _networkDatasource.getMovies();
+        // TODO: transform MovieNetworkE to MovieAppE
+        
         _moviesCache.addAll(movies);
         _moviesController.add(_moviesCache);
       } catch (e) {
@@ -34,7 +36,7 @@ class MoviesRepository {
   // Fetch latest movies from network
   Future<List<MovieAppE>> fetchMovies() async {
     try {
-      final movies = await _datasource.getMovies();
+      final movies = await _networkDatasource.getMovies();
       _moviesCache.clear();
       _moviesCache.addAll(movies);
       _moviesController.add(_moviesCache);
