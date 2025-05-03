@@ -3,6 +3,8 @@
 
 ### USER SPECIFIC ###
 .plugin_symlinks
+# restrictions on android derivatives
+**/android/app/.cxx/
 
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
