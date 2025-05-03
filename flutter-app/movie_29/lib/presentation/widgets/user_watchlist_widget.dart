@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:movie_29/utils/watchlist_support.dart';
 import '../../domain/entities/movie_app_e.dart';
 import 'movie_card_row.dart';
 
 class UserWatchlistWidget extends StatelessWidget {
   final List<MovieAppE> watchlist;
+  final WatchlistSupport watchlistSupport;
   final Function(MovieAppE) onMovieTap;
   final Function(String) onRemoveTap;
 
   const UserWatchlistWidget({
     super.key,
     required this.watchlist,
+    required this.watchlistSupport,
     required this.onMovieTap,
     required this.onRemoveTap,
   });
@@ -54,7 +57,11 @@ class UserWatchlistWidget extends StatelessWidget {
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (_) => onRemoveTap(movie.id),
-              child: MovieCardRow(movie: movie, onTap: () => onMovieTap(movie)),
+              child: MovieCardRow(
+                movie: movie,
+                onTap: () => onMovieTap(movie),
+                watchlistSupport: watchlistSupport,
+              ),
             );
           },
         ),

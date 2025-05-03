@@ -4,18 +4,18 @@ import '../../data/repositories/movies_repository.dart';
 import '../../domain/entities/movie_app_e.dart';
 import '../widgets/movie_card_row.dart';
 import 'movie_details_screen.dart';
-import '../../utils/watch_list_support.dart';
+import '../../utils/watchlist_support.dart';
 
 class MoviesListScreen extends StatefulWidget {
   final MoviesRepository moviesRepository;
   final UserRepository userRepository;
-  late final WatchListSupport watchListSupport;
-  
+  late final WatchlistSupport watchListSupport;
+
   MoviesListScreen({
     super.key,
     required this.moviesRepository,
     required this.userRepository,
-  }) : watchListSupport = WatchListSupport(
+  }) : watchListSupport = WatchlistSupport(
          moviesRepository: moviesRepository,
          userRepository: userRepository,
        );
@@ -101,8 +101,13 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
                     return MovieCardRow(
                       movie: movie,
                       onTap: () => _navigateToDetails(movie),
+                      watchlistSupport: widget.watchListSupport,
                       onFavoriteTap: () async {
-                        widget.watchListSupport.addToWatchlist(movie);
+                        debugPrint('Favorite tapped for ${movie.title}');
+
+                        widget.watchListSupport.updateWatchlistWithMoview(
+                          movie,
+                        );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

@@ -20,7 +20,6 @@ class MovieAppE implements Movie {
   final String storyline;
   @override
   final List<String> actors;
-  final bool isFavorite;
 
   MovieAppE({
     required this.id,
@@ -32,7 +31,6 @@ class MovieAppE implements Movie {
     required this.duration,
     required this.storyline,
     required this.actors,
-    this.isFavorite = false,
   });
 
   factory MovieAppE.fromNetworkEntity(MovieNetworkE networkEntity) {
@@ -73,7 +71,6 @@ class MovieAppE implements Movie {
       duration: duration ?? this.duration,
       storyline: storyline ?? this.storyline,
       actors: actors ?? this.actors,
-      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 }

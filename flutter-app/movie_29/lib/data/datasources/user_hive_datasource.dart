@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:movie_29/domain/entities/user_hive_e.dart';
 
@@ -9,6 +10,8 @@ class UserHiveDatasource {
   Future<void> addUser(UserHiveE user) async {
     await clearAllUsers();
     await userBox.put(user.id, user);
+
+    debugPrint('User added: ${user.id}, ${user.name}');
   }
 
   // Update a user
@@ -28,6 +31,10 @@ class UserHiveDatasource {
 
   // Get all users
   List<UserHiveE> getAllUsers() {
-    return userBox.values.toList();
+    final List<UserHiveE> users = userBox.values.toList();
+    
+    debugPrint('All users: ${users.map((user) => user.name).toList()}');
+
+    return users;
   }
 }

@@ -8,15 +8,18 @@ import '../widgets/user_name_widget.dart';
 import '../widgets/user_watchlist_widget.dart';
 import 'movie_details_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'package:movie_29/utils/watchlist_support.dart';
 
 class UserScreen extends StatefulWidget {
   final UserRepository userRepository;
   final MoviesRepository moviesRepository;
+  final WatchlistSupport watchlistSupport;
 
   const UserScreen({
     super.key,
     required this.userRepository,
     required this.moviesRepository,
+    required this.watchlistSupport,
   });
 
   @override
@@ -204,6 +207,7 @@ class _UserScreenState extends State<UserScreen> {
             // Watchlist
             UserWatchlistWidget(
               watchlist: _watchlistMovies,
+              watchlistSupport: widget.watchlistSupport,
               onMovieTap: _navigateToMovieDetails,
               onRemoveTap: _removeFromWatchlist,
             ),

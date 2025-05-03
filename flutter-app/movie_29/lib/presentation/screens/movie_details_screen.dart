@@ -7,23 +7,25 @@ import '../widgets/movie_genres_widget.dart';
 import '../widgets/movie_poster_widget.dart';
 import '../widgets/movie_rating_widget.dart';
 import '../widgets/movie_title_widget.dart';
-import '../../utils/watch_list_support.dart';
+import '../../utils/watchlist_support.dart';
 
 class MovieDetailsScreen extends StatelessWidget {
   final MovieAppE movie;
   final MoviesRepository moviesRepository;
   final UserRepository userRepository;
-  late final WatchListSupport watchListSupport;
+  late final WatchlistSupport watchlistSupport;
+  final VoidCallback? onFavoriteTap;
 
   MovieDetailsScreen({
     super.key,
     required this.movie,
     required this.moviesRepository,
     required this.userRepository,
-  }) : watchListSupport = WatchListSupport(
-          moviesRepository: moviesRepository,
-          userRepository: userRepository,
-        );
+    this.onFavoriteTap,
+  }) : watchlistSupport = WatchlistSupport(
+         moviesRepository: moviesRepository,
+         userRepository: userRepository,
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -31,23 +33,17 @@ class MovieDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(movie.title),
         actions: [
-          IconButton(
-            icon: Icon(
-              movie.isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: movie.isFavorite ? Colors.red : null,
-            ),
-            onPressed: () {
-              // repository.toggleFavorite(movie.id);
-              // ScaffoldMessenger.of(context).showSnackBar(
-              //   SnackBar(
-              //     content: Text(
-              //       movie.isFavorite
-              //           ? 'Removed from favorites'
-              //           : 'Added to favorites',
-              //     ),
-              //     duration: const Duration(seconds: 1),
-              //   ),
-              // );
+          FutureBuilder<bool>(
+            future: watchlistSupport.isMovieInWatchlist(movie),
+            builder: (context, snapshot) {
+              final isInWatchlist = snapshot.data ?? false;
+              return IconButton(
+                icon: Icon(
+                  isInWatchlist ? Icons.favorite : Icons.favorite_border,
+                  color: isInWatchlist ? Colors.red : null,
+                ),
+                onPressed: onFavoriteTap,
+              );
             },
           ),
         ],

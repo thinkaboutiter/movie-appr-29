@@ -4,6 +4,7 @@ import '../../data/repositories/movies_repository.dart';
 import '../../presentation/screens/movies_list_screen.dart';
 import '../../presentation/screens/user_screen.dart';
 import 'package:movie_29/domain/entities/user_app_e.dart';
+import '../../utils/watchlist_support.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,6 +18,7 @@ final bool isUsingStubData = false;
 class _MainScreenState extends State<MainScreen> {
   late final MoviesRepository _moviesRepository;
   late final UserRepository _userRepository;
+  late final WatchlistSupport _watchlistSupport;
 
   int _selectedIndex = 0;
 
@@ -25,16 +27,21 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     _moviesRepository = MoviesRepository();
     _userRepository = UserRepository();
+    _watchlistSupport = WatchlistSupport(
+      moviesRepository: _moviesRepository,
+      userRepository: _userRepository,
+    );
     _createDefaultUser();
   }
 
   void _createDefaultUser() async {
-    // Create default user if none exists
+    debugPrint('Creating default user');
+
     final defaultUser = await _userRepository.fetchUser();
     if (defaultUser != null) {
       return;
     }
-    final newUser = UserAppE(id: '1', name: 'Movie Fan', watchlistIds: []);
+    final newUser = UserAppE(id: '1', name: 'Hello Movie Fan 1', watchlistIds: []);
     await _userRepository.saveUser(newUser);
   }
 
@@ -63,7 +70,8 @@ class _MainScreenState extends State<MainScreen> {
           UserScreen(
             userRepository: _userRepository,
             moviesRepository: _moviesRepository,
-          ),
+            watchlistSupport: _watchlistSupport,
+            ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
