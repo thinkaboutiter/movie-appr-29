@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/datasources/user_local_datasource.dart';
+import 'package:movie_29/data/repositories/user_repository.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../domain/entities/movie_app_e.dart';
 import '../../domain/entities/user_app_e.dart';
@@ -8,15 +8,18 @@ import '../widgets/user_name_widget.dart';
 import '../widgets/user_watchlist_widget.dart';
 import 'movie_details_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'package:movie_29/utils/watchlist_support.dart';
 
 class UserScreen extends StatefulWidget {
-  final UserLocalDataSource userDataSource;
+  final UserRepository userRepository;
   final MoviesRepository moviesRepository;
+  final WatchlistSupport watchlistSupport;
 
   const UserScreen({
     super.key,
-    required this.userDataSource,
+    required this.userRepository,
     required this.moviesRepository,
+    required this.watchlistSupport,
   });
 
   @override
@@ -41,7 +44,7 @@ class _UserScreenState extends State<UserScreen> {
 
     try {
       // Get user from local storage
-      final user = await widget.userDataSource.getUser();
+      final user = await widget.userRepository.fetchUser();
 
       // Create default user if none exists
       if (user == null) {
@@ -50,7 +53,7 @@ class _UserScreenState extends State<UserScreen> {
           name: 'Movie Fan',
           watchlistIds: [],
         );
-        await widget.userDataSource.saveUser(defaultUser);
+        await widget.userRepository.saveUser(defaultUser);
         setState(() {
           _user = defaultUser;
         });
@@ -77,7 +80,10 @@ class _UserScreenState extends State<UserScreen> {
   }
 
   Future<void> _loadWatchlistMovies() async {
-    if (_user == null) return;
+    if (_user == null) {
+      debugPrint('User is null, cannot load watchlist');
+      return;
+    }
 
     try {
       List<MovieAppE> watchlist = [];
@@ -108,17 +114,13 @@ class _UserScreenState extends State<UserScreen> {
 
   Future<void> _removeFromWatchlist(String movieId) async {
     try {
-      final updatedUser = await widget.userDataSource.updateWatchlist(
-        movieId,
-        false,
-      );
-
-      if (updatedUser != null) {
-        setState(() {
-          _user = updatedUser;
-          _watchlistMovies.removeWhere((movie) => movie.id == movieId);
-        });
+      if (_user == null) {
+        debugPrint('User is null, cannot remove from watchlist');
+        return;
       }
+
+      // TODO: Presentation layer should not modify domain entities directly - involve data layer!!!
+      debugPrint('Implement removing movie $movieId from watchlist');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -139,7 +141,8 @@ class _UserScreenState extends State<UserScreen> {
         builder:
             (context) => MovieDetailsScreen(
               movie: movie,
-              repository: widget.moviesRepository,
+              moviesRepository: widget.moviesRepository,
+              userRepository: widget.userRepository,
             ),
       ),
     ).then((_) => _loadWatchlistMovies());
@@ -204,6 +207,7 @@ class _UserScreenState extends State<UserScreen> {
             // Watchlist
             UserWatchlistWidget(
               watchlist: _watchlistMovies,
+              watchlistSupport: widget.watchlistSupport,
               onMovieTap: _navigateToMovieDetails,
               onRemoveTap: _removeFromWatchlist,
             ),
@@ -256,7 +260,7 @@ class _UserScreenState extends State<UserScreen> {
                       : avatarController.text.trim(),
             );
 
-            await widget.userDataSource.saveUser(updatedUser);
+            await widget.userRepository.saveUser(updatedUser);
 
             setState(() {
               _user = updatedUser;

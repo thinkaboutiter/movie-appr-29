@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_29/utils/watchlist_support.dart';
 import '../../domain/entities/movie_app_e.dart';
 import 'movie_poster_widget.dart';
 import 'movie_rating_widget.dart';
@@ -6,12 +7,14 @@ import 'movie_title_widget.dart';
 
 class MovieCardRow extends StatelessWidget {
   final MovieAppE movie;
+  final WatchlistSupport watchlistSupport;
   final VoidCallback onTap;
   final VoidCallback? onFavoriteTap;
 
   const MovieCardRow({
     super.key,
     required this.movie,
+    required this.watchlistSupport,
     required this.onTap,
     this.onFavoriteTap,
   });
@@ -48,14 +51,20 @@ class MovieCardRow extends StatelessWidget {
                           ),
                         ),
                         if (onFavoriteTap != null)
-                          IconButton(
-                            icon: Icon(
-                              movie.isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: movie.isFavorite ? Colors.red : null,
-                            ),
-                            onPressed: onFavoriteTap,
+                          FutureBuilder<bool>(
+                            future: watchlistSupport.isMovieInWatchlist(movie),
+                            builder: (context, snapshot) {
+                              final isInWatchlist = snapshot.data ?? false;
+                              return IconButton(
+                                icon: Icon(
+                                  isInWatchlist
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: isInWatchlist ? Colors.red : null,
+                                ),
+                                onPressed: onFavoriteTap,
+                              );
+                            },
                           ),
                       ],
                     ),

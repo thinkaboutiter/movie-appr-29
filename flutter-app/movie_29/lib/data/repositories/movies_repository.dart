@@ -1,10 +1,30 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:movie_29/data/datasources/movies_datasource.dart';
 import '../../domain/entities/movie_app_e.dart';
+import '../../domain/entities/movie_network_e.dart';
+import '../datasources/movies_network_datasource_i.dart';
+import '../datasources/movies_network_datasource.dart';
 
 class MoviesRepository {
-  final MoviesDatasource _datasource;
+  static MovieAppE movieAppEntityFromNetworkEntity(MovieNetworkE networkMovie) {
+    return MovieAppE(
+      id: networkMovie.id,
+      title: networkMovie.title,
+      year: networkMovie.year,
+      genres: networkMovie.genres,
+      posterUrl: networkMovie.posterUrl,
+      rating: networkMovie.rating,
+      duration: networkMovie.duration,
+      storyline: networkMovie.storyline,
+      actors: networkMovie.actors,
+    );
+  }
+
+  final MoviesNetworkDatasourceI _networkDatasource;
+  
+  MoviesRepository({
+    MoviesNetworkDatasourceI? networkDatasource,
+  }) : _networkDatasource = networkDatasource ?? MoviesNetworkDataSource();
 
   // Cache for movies
   final List<MovieAppE> _moviesCache = [];
@@ -15,26 +35,29 @@ class MoviesRepository {
   // Stream of movies
   Stream<List<MovieAppE>> get movies => _moviesController.stream;
 
-  MoviesRepository({required MoviesDatasource datasource})
-    : _datasource = datasource;
-
-  // Initialize repository with stub data
-  Future<void> init() async {
-    if (_moviesCache.isEmpty) {
-      try {
-        final movies = await _datasource.getMovies();
-        _moviesCache.addAll(movies);
-        _moviesController.add(_moviesCache);
-      } catch (e) {
-        debugPrint('Error loading stub movies: $e');
-      }
-    }
-  }
+  // Future<void> init() async {
+  //   if (_moviesCache.isEmpty) {
+  //     try {
+  //       return await fetchMovies()
+  //     } catch (e) {
+  //       debugPrint('Error loading stub movies: $e');
+  //     }
+  //   }
+  // }
 
   // Fetch latest movies from network
   Future<List<MovieAppE>> fetchMovies() async {
     try {
-      final movies = await _datasource.getMovies();
+      final networkMovies = await _networkDatasource.getMovies();
+      final movies =
+          networkMovies
+              .map(
+                (networkMovie) => movieAppEntityFromNetworkEntity(networkMovie),
+              )
+              .toList();
+
+      debugPrint('Fetched ${movies.length} movies from network');
+
       _moviesCache.clear();
       _moviesCache.addAll(movies);
       _moviesController.add(_moviesCache);
@@ -58,17 +81,17 @@ class MoviesRepository {
   }
 
   // Toggle favorite status
-  Future<void> toggleFavorite(String id) async {
-    final index = _moviesCache.indexWhere((movie) => movie.id == id);
-    
-    debugPrint('Toggling favorite for movie with ID: $id, index: $index');
+  // Future<void> toggleFavorite(String id) async {
+  //   final index = _moviesCache.indexWhere((movie) => movie.id == id);
 
-    if (index != -1) {
-      final movie = _moviesCache[index];
-      _moviesCache[index] = movie.copyWith(isFavorite: !movie.isFavorite);
-      _moviesController.add(_moviesCache);
-    }
-  }
+  //   debugPrint('Toggling favorite for movie with ID: $id, index: $index');
+
+  //   if (index != -1) {
+  //     final movie = _moviesCache[index];
+  //     _moviesCache[index] = movie.copyWith(isFavorite: !movie.isFavorite);
+  //     _moviesController.add(_moviesCache);
+  //   }
+  // }
 
   void dispose() {
     _moviesController.close();

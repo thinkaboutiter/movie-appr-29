@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:movie_29/data/datasources/movies_datasource.dart';
-import 'package:movie_29/utils/constants.dart';
-import '../../data/datasources/movies_network_datasource.dart';
-import '../../data/datasources/movies_stub_datasource.dart';
-import '../../data/datasources/user_local_datasource.dart';
+import 'package:movie_29/data/repositories/user_repository.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../presentation/screens/movies_list_screen.dart';
 import '../../presentation/screens/user_screen.dart';
+import 'package:movie_29/domain/entities/user_app_e.dart';
+import '../../utils/watchlist_support.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,22 +16,33 @@ class MainScreen extends StatefulWidget {
 final bool isUsingStubData = false;
 
 class _MainScreenState extends State<MainScreen> {
-  late final MoviesDatasource _datasource;
   late final MoviesRepository _moviesRepository;
-  late final UserLocalDataSource _userDataSource;
+  late final UserRepository _userRepository;
+  late final WatchlistSupport _watchlistSupport;
 
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    if (isUsingStubData) {
-      _datasource = MoviesStubDataSource();
-    } else {
-      _datasource = MoviesNetworkDataSource(apiUrl: ApiEndpoints.movies);
+    _moviesRepository = MoviesRepository();
+    _userRepository = UserRepository();
+    _watchlistSupport = WatchlistSupport(
+      moviesRepository: _moviesRepository,
+      userRepository: _userRepository,
+    );
+    _createDefaultUser();
+  }
+
+  void _createDefaultUser() async {
+    debugPrint('Creating default user');
+
+    final defaultUser = await _userRepository.fetchUser();
+    if (defaultUser != null) {
+      return;
     }
-    _moviesRepository = MoviesRepository(datasource: _datasource);
-    _userDataSource = UserLocalDataSource();
+    final newUser = UserAppE(id: '1', name: 'Hello Movie Fan 1', watchlistIds: []);
+    await _userRepository.saveUser(newUser);
   }
 
   @override
@@ -54,11 +63,15 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          MoviesListScreen(repository: _moviesRepository),
-          UserScreen(
-            userDataSource: _userDataSource,
+          MoviesListScreen(
             moviesRepository: _moviesRepository,
+            userRepository: _userRepository,
           ),
+          UserScreen(
+            userRepository: _userRepository,
+            moviesRepository: _moviesRepository,
+            watchlistSupport: _watchlistSupport,
+            ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
